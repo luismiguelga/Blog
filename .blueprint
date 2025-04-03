@@ -1,0 +1,19 @@
+created:
+    - database/factories/PostFactory.php
+    - database/factories/TagFactory.php
+    - database/factories/CategorieFactory.php
+    - database/factories/CommentFactory.php
+    - database/migrations/2025_04_02_153655_create_posts_table.php
+    - database/migrations/2025_04_02_153656_create_tags_table.php
+    - database/migrations/2025_04_02_153657_create_categories_table.php
+    - database/migrations/2025_04_02_153658_create_comments_table.php
+    - app/Models/Post.php
+    - app/Models/Tag.php
+    - app/Models/Categorie.php
+    - app/Models/Comment.php
+models:
+    User: { name: string, email: string, email_verified_at: 'timestamp nullable', password: string, remember_token: 'string:100 nullable' }
+    Post: { title: string, date_publish: datetime, slug: string, description: string, body: string, status: string, user_id: unsignedInteger, category_id: unsignedInteger, relationships: { hasMany: 'Tag, Categorie, Comment' } }
+    Tag: { name: string, slug: string, relationships: { belongsTo: Post } }
+    Categorie: { name: string, slug: string }
+    Comment: { content: string, user_id: unsignedInteger, post_id: unsignedInteger, status: string, relationships: { belongsTo: Post } }

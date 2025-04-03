@@ -1,0 +1,31 @@
+models:
+
+  Post:
+    title: string
+    date_publish: datetime
+    slug: string
+    description: string
+    body: string
+    status: string
+    user_id: unsignedInteger
+    category_id: unsignedInteger
+    relationships:
+      hasMany: Tag, Categorie, Comment
+
+  Tag:
+    name: string
+    slug: string
+    relationships:
+      belongsTo: Post
+
+  Categorie:
+    name: string
+    slug: string
+
+  Comment:
+    content: string
+    user_id: unsignedInteger
+    post_id: unsignedInteger
+    status: string
+    relationships:
+      belongsTo: Post
