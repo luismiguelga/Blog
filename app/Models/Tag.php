@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -44,13 +47,29 @@ class Tag extends Model
             TextInput::make('name')
                 ->columnSpanFull()
                 ->required()
-                ->maxLength(255),
-            // TextInput::make('slug')
-            //     ->required()
-            //     ->maxLength(255),
+                ->maxLength(255)
+                ->live(debounce: 1000)
+                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', str($state)->slug())),
+            Hidden::make('slug')
+                ->required()
+                ->live(),
             Toggle::make('status')
-                ->label('Estado'),
+                ->label('Estado')
+                ->default(true),
+            Actions::make([
+                Action::make('star')
+                    ->label('Rellenar')
+                    ->action(function ($livewire) {
+                        $data = Tag::factory()->make()->toArray();
+                        $data['slug'] = str($data['name'])->slug();
+                        $livewire->form->fill($data);
+                    }),
+            ]),
         ];
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
 }

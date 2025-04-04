@@ -17,9 +17,11 @@ class ViewPost extends ViewRecord
     protected function getHeaderActions(): array
     {
 
-        return[
+        return [
             Actions\EditAction::make()
-            ->form(Comment::getForm()),
+            ->form(fn () => Comment::getForm())
+            ->url(fn () => route('filament.app.resources.posts.edit', ['record' => $this->record->slug])),
         ];
     }
+
 }

@@ -51,7 +51,7 @@ class TagResource extends Resource
             ->filters([
                 //
             ])
-            ->recordUrl(fn (Tag $record) => static::getUrl('edit', ['record' => $record->slug]))
+            ->recordUrl(fn(Tag $record) => static::getUrl('edit', ['record' => $record->slug]))
             ->actions([
                 Tables\Actions\EditAction::make()
                 ->url(fn(Tag $record) => static::getUrl('edit', ['record' => $record->slug])),

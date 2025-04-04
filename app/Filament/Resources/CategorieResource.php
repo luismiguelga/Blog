@@ -51,7 +51,7 @@ class CategorieResource extends Resource
             ->filters([
                 //
             ])
-            ->recordUrl(fn (Categorie $record) => static::getUrl('edit', ['record' => $record->slug]))
+            ->recordUrl(fn(Categorie $record) => static::getUrl('edit', ['record' => $record->slug]))
             ->actions([
                 Tables\Actions\EditAction::make()
                 ->url(fn(Categorie $record) => static::getUrl('edit', ['record' => $record->slug])),

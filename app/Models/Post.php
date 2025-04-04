@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Enums\Status;
 use Carbon\Carbon;
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
@@ -86,43 +88,39 @@ class Post extends Model implements HasMedia
                         ->label('Titulo')
                         ->required()
                         ->maxLength(255)
-                        // ->persisStateInsession()
-                        ->default('Post nuevo'),
+                        ->live(debounce: 1000)
+                        ->afterStateUpdated(fn ($state, callable $set) => $set('slug', str($state)->slug())),
                     TextInput::make('description')
                         ->label('Descripción')
                         ->required()
-                        ->maxLength(255)
-                        ->default('description'),
+                        ->maxLength(255),
                     Select::make('status')
                         ->label('Estado')
-                        // ->hidden()
                         ->options([
                             Status::DRAFT->value => Status::DRAFT->getLabel(),
                             Status::PUBLIC->value => Status::PUBLIC->getLabel(),
                             Status::PRIVATE->value => Status::PRIVATE->getLabel(),
                         ])
-                        // ->default(Status::PUBLIC->value)
                         ->required(),
                     TextInput::make('slug')
-                        ->label('slug')
                         ->required()
-                        ->maxLength(255)
-                        ->default('slug'),
+                        ->live(),
                     Hidden::make('user_id')
-                        ->default($user)
-                        ->required(),
+                        ->required()
+                        ->default($user),
                     Select::make('category_id')
                         ->label('Categoria')
                         ->searchable()
                         ->preload()
                         ->required()
+                        ->createOptionForm(Categorie::getForm())
                         ->options(\App\Models\Categorie::get()->where('status', 1)->pluck('name', 'id')),
                     DateTimePicker::make('date_publish')
                         ->label('Fecha de publicacion')
                         ->required()
                         ->default($date),
                     RichEditor::make('body')
-                        ->label('Comentario')
+                        ->label('Cuerpo')
                         ->columnSpanFull()
                         ->required()
                         ->maxLength(255),
@@ -136,8 +134,17 @@ class Post extends Model implements HasMedia
                                 ->image()
                                 ->imageEditor(),
                         ]),
+                    Actions::make([
+                        Action::make('star')
+                            ->label('Rellenar')
+                            ->action(function ($livewire) {
+                                $data = Post::factory()->make()->toArray();
+                                $data['user'] = Auth::user()->id;
+                                $data['slug'] = str($data['title'])->slug();
+                                $livewire->form->fill($data);
+                            }),
+                    ]),
                 ]),
         ];
     }
-
 }
