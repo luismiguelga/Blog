@@ -149,6 +149,21 @@ class PostResource extends Resource
         return 'slug';
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return 'Publicación';
+    }
+
+    public static function getLabel(): string
+    {
+        return 'publicación';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Publicaciones';
+    }
+
     public static function getPages(): array
     {
         return [

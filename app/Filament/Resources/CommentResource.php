@@ -81,6 +81,16 @@ class CommentResource extends Resource
         ];
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return 'Comentario';
+    }
+
+    public static function getLabel(): string
+    {
+        return 'Comentario';
+    }
+
     public static function getPages(): array
     {
         return [

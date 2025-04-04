@@ -26,10 +26,11 @@ class CategorieResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nombre')
                     ->searchable(),
-                // Tables\Columns\TextColumn::make('slug')
-                //     ->searchable(),
+
                 Tables\Columns\TextColumn::make('status')
+                    ->label('Estado')
                     ->badge()
                     ->sortable()
                     ->formatStateUsing(function ($state) {
@@ -51,10 +52,10 @@ class CategorieResource extends Resource
             ->filters([
                 //
             ])
-            ->recordUrl(fn(Categorie $record) => static::getUrl('edit', ['record' => $record->slug]))
+            ->recordUrl(fn (Categorie $record) => static::getUrl('edit', ['record' => $record->slug]))
             ->actions([
                 Tables\Actions\EditAction::make()
-                ->url(fn(Categorie $record) => static::getUrl('edit', ['record' => $record->slug])),
+                    ->url(fn (Categorie $record) => static::getUrl('edit', ['record' => $record->slug])),
 
             ])
             ->bulkActions([
@@ -74,6 +75,16 @@ class CategorieResource extends Resource
     public static function getRecordRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Categoria';
+    }
+
+    public static function getLabel(): string
+    {
+        return 'Categoria';
     }
 
     public static function getPages(): array

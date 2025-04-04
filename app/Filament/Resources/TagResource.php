@@ -26,10 +26,10 @@ class TagResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nombre')
                     ->searchable(),
-                // Tables\Columns\TextColumn::make('slug')
-                //     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
+                    ->label('Estado')
                     ->badge()
                     ->sortable()
                     ->formatStateUsing(function ($state) {
@@ -73,6 +73,16 @@ class TagResource extends Resource
     public static function getRecordRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Etiqueta';
+    }
+
+    public static function getLabel(): string
+    {
+        return 'etiqueta';
     }
 
     public static function getPages(): array

@@ -8,6 +8,7 @@ use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use App\Models\Categorie;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
@@ -89,7 +90,7 @@ class Post extends Model implements HasMedia
                         ->required()
                         ->maxLength(255)
                         ->live(debounce: 1000)
-                        ->afterStateUpdated(fn ($state, callable $set) => $set('slug', str($state)->slug())),
+                        ->afterStateUpdated(fn($state, callable $set) => $set('slug', str($state)->slug())),
                     TextInput::make('description')
                         ->label('Descripción')
                         ->required()
@@ -102,7 +103,7 @@ class Post extends Model implements HasMedia
                             Status::PRIVATE->value => Status::PRIVATE->getLabel(),
                         ])
                         ->required(),
-                    TextInput::make('slug')
+                    Hidden::make('slug')
                         ->required()
                         ->live(),
                     Hidden::make('user_id')
@@ -114,7 +115,11 @@ class Post extends Model implements HasMedia
                         ->preload()
                         ->required()
                         ->createOptionForm(Categorie::getForm())
-                        ->options(\App\Models\Categorie::get()->where('status', 1)->pluck('name', 'id')),
+                        ->createOptionUsing(function ($data) {
+                            $category = Categorie::create($data);
+                            return $category->id;
+                        })
+                        ->options(Categorie::get()->where('status', 1)->pluck('name', 'id')),
                     DateTimePicker::make('date_publish')
                         ->label('Fecha de publicacion')
                         ->required()

@@ -45,11 +45,12 @@ class Tag extends Model
     {
         return [
             TextInput::make('name')
+                ->label('Nombre')
                 ->columnSpanFull()
                 ->required()
                 ->maxLength(255)
                 ->live(debounce: 1000)
-                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', str($state)->slug())),
+                ->afterStateUpdated(fn($state, callable $set) => $set('slug', str($state)->slug())),
             Hidden::make('slug')
                 ->required()
                 ->live(),
