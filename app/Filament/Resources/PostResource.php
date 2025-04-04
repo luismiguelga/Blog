@@ -52,7 +52,7 @@ class PostResource extends Resource
                 // Tables\Columns\TextColumn::make('body')
                 //     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('Autor')
+                    ->label(__('labels.user_name'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Estado')

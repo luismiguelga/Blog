@@ -13,7 +13,7 @@ class CategorieResource extends Resource
 {
     protected static ?string $model = Categorie::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
 
     public static function form(Form $form): Form
     {
@@ -26,20 +26,15 @@ class CategorieResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nombre')
+                    ->label(__('labels.name'))
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('status')
-                    ->label('Estado')
+                    ->label('Estados')
                     ->badge()
                     ->sortable()
-                    ->formatStateUsing(function ($state) {
-                        return match ($state) {
-                            1 => 'Activo',
-                            0 => 'Pendiente',
-                        };
-                    })
-                    ->color(fn ($state) => $state ? 'success' : 'danger'),
+                    ->formatStateUsing(fn($state) => $state ? 'Activo' : 'Pendiente')
+                    ->color(fn($state) => $state ? 'success' : 'danger'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -52,15 +47,12 @@ class CategorieResource extends Resource
             ->filters([
                 //
             ])
-            ->recordUrl(fn (Categorie $record) => static::getUrl('edit', ['record' => $record->slug]))
+            ->defaultSort('created_at', 'desc')
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->url(fn (Categorie $record) => static::getUrl('edit', ['record' => $record->slug])),
-
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -72,20 +64,21 @@ class CategorieResource extends Resource
         ];
     }
 
-    public static function getRecordRouteKeyName(): string
-    {
-        return 'slug';
-    }
-
     public static function getNavigationLabel(): string
     {
-        return 'Categoria';
+        return __('modules.categories.plural_name');
     }
 
     public static function getLabel(): string
     {
-        return 'Categoria';
+        return __('modules.categories.singular_name');
     }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('modules.categories.plural_name');
+    }
+
 
     public static function getPages(): array
     {

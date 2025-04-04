@@ -116,6 +116,7 @@ class Post extends Model implements HasMedia
                         ->required()
                         ->createOptionForm(Categorie::getForm())
                         ->createOptionUsing(function ($data) {
+                            $data['slug'] = $data['name'];
                             $category = Categorie::create($data);
                             return $category->id;
                         })
