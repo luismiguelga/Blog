@@ -40,6 +40,7 @@ class Post extends Model implements HasMedia
         'title',
         'date_publish',
         'slug',
+        'cover',
         'description',
         'body',
         'status',
@@ -142,6 +143,7 @@ class Post extends Model implements HasMedia
                         ->columnSpanFull()
                         ->maxSize(1024 * 1024 * 10)
                         ->label(__('labels.cover'))
+                        ->directory(fn() => 'user-'.Auth::user()->id.'/posts')
                         ->image()
                         ->imageEditor(),
                     Actions::make([
