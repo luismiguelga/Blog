@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Categorie;
+use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         Post::factory(10)->create();
         Tag::factory(10)->create();
-        Categorie::factory(10)->create();
+        Category::factory(10)->create();
 
         User::factory()->create([
             'name' => 'luis',

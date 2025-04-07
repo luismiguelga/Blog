@@ -14,7 +14,7 @@ class CommentResource extends Resource
 {
     protected static ?string $model = Comment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
 
     public static function form(Form $form): Form
     {
@@ -27,18 +27,18 @@ class CommentResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('content')
-                    ->label('Contenido')
+                    ->label(__('labels.content'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('Usuario')
+                    ->label(__('labels.user_name'))
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('post.title')
-                    ->label('Titulo del post')
+                    ->label(__('labels.post'))
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('Estado')
+                    ->label(__('labels.status'))
                     ->badge()
                     ->sortable()
                     ->formatStateUsing(function ($state) {
@@ -49,10 +49,12 @@ class CommentResource extends Resource
                     })
                     ->color(fn($state) => $state ? 'success' : 'danger'),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('labels.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('labels.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -68,9 +70,7 @@ class CommentResource extends Resource
                 }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\BulkActionGroup::make([]),
             ]);
     }
 

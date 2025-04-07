@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\Status;
-use App\Models\Categorie;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\Post;
@@ -32,7 +32,7 @@ class PostFactory extends Factory
             'body' => fake()->text(),
             'status' => fake()->randomElement(Status::class),
             'user_id' => User::factory(),
-            'category_id' => Categorie::factory(),
+            'category_id' => Category::factory(),
         ];
     }
 }

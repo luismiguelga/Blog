@@ -13,7 +13,7 @@ class TagResource extends Resource
 {
     protected static ?string $model = Tag::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
 
     public static function form(Form $form): Form
     {
@@ -26,10 +26,10 @@ class TagResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nombre')
+                    ->label(__('labels.name'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('Estado')
+                    ->label(__('labels.status'))
                     ->badge()
                     ->sortable()
                     ->formatStateUsing(function ($state) {
@@ -40,26 +40,25 @@ class TagResource extends Resource
                     })
                     ->color(fn ($state) => $state ? 'success' : 'danger'),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('labels.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('labels.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+
             ])
-            ->recordUrl(fn(Tag $record) => static::getUrl('edit', ['record' => $record->slug]))
+            ->defaultSort('created_at', 'desc')
             ->actions([
                 Tables\Actions\EditAction::make()
-                ->url(fn(Tag $record) => static::getUrl('edit', ['record' => $record->slug])),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\BulkActionGroup::make([]),
             ]);
     }
 
@@ -70,19 +69,14 @@ class TagResource extends Resource
         ];
     }
 
-    public static function getRecordRouteKeyName(): string
-    {
-        return 'slug';
-    }
-
     public static function getNavigationLabel(): string
     {
-        return 'Etiqueta';
+        return __('modules.tags.plural_name');
     }
 
     public static function getLabel(): string
     {
-        return 'etiqueta';
+        return __('modules.tags.singular_name');
     }
 
     public static function getPages(): array

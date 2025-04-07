@@ -9,4 +9,11 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateTag extends CreateRecord
 {
     protected static string $resource = TagResource::class;
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['slug'] = $data['name'];
+        
+        return $data;
+    }
 }

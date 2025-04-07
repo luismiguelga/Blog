@@ -40,24 +40,22 @@ class Comment extends Model
 
     public static function getForm()
     {
-        $user = Auth::user()->id;
         return [
             RichEditor::make('content')
-                ->label('Contenido')
+                ->label(__('labels.content'))
                 ->required()
                 ->columnSpanFull()
                 ->maxLength(255)
                 ->disableToolbarButtons(['attachFiles', 'link']),
             Hidden::make('user_id')
                 ->required()
-                ->default($user),
+                ->default(Auth::user()->id),
             // Hidden::make('post_id')
             //     ->required()
             //     ->default($post),
             Hidden::make('status')
                 ->required()
                 ->default(false)
-                // ->maxLength(255),
         ];
     }
 }

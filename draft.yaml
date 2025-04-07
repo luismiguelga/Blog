@@ -10,7 +10,7 @@ models:
     user_id: unsignedInteger
     category_id: unsignedInteger
     relationships:
-      hasMany: Tag, Categorie, Comment
+      hasMany: Tag, Category, Comment
 
   Tag:
     name: string
@@ -18,7 +18,7 @@ models:
     relationships:
       belongsTo: Post
 
-  Categorie:
+  Category:
     name: string
     slug: string
 

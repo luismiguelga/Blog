@@ -18,6 +18,7 @@ class ListComments extends ListRecords
         ];
     }
 
+
     public function getTabs(): array
     {
         return [

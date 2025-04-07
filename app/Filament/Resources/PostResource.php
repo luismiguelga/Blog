@@ -17,12 +17,13 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Enum;
 
 class PostResource extends Resource
 {
     protected static ?string $model = Post::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
     public static function form(Form $form): Form
     {
@@ -37,7 +38,7 @@ class PostResource extends Resource
                 Tables\Columns\ImageColumn::make('cover')
                     ->label('')
                     ->defaultImageUrl(function ($record) {
-                        return 'https://ui-avatars.com/api/?background=0D8ABC&color=fff&name='.urlencode($record->name);
+                        return 'https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=' . urlencode($record->name);
                     }),
                 Tables\Columns\TextColumn::make('title')
                     ->label('Publicación')
@@ -47,26 +48,19 @@ class PostResource extends Resource
                         return Str::limit($record->description, 40);
                     }),
 
-                // Tables\Columns\TextColumn::make('slug'),
-                // Tables\Columns\TextColumn::make('status')->badge(),
-                // Tables\Columns\TextColumn::make('body')
-                //     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label(__('labels.user_name'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->label('Estado')
+                    ->label(__('labels.status'))
                     ->badge()
                     ->sortable()
                     ->color(function ($state) {
                         return Status::from($state)->getColor();
                     })
                     ->searchable(),
-                // Tables\Columns\TextColumn::make('categories.name')
-                //     ->label('Categoria')
-                //     ->sortable(),
                 Tables\Columns\TextColumn::make('date_publish')
-                    ->label('Fecha de publicación')
+                    ->label(__('labels.date_publish'))
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
@@ -75,21 +69,23 @@ class PostResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status')
+                    ->multiple()
+                    ->searchable()
+                    ->label(__('labels.status'))
+                    ->options([
+                        Status::DRAFT->value => Status::DRAFT->getLabel(),
+                        Status::PUBLIC->value => Status::PUBLIC->getLabel(),
+                        Status::PRIVATE->value => Status::PRIVATE->getLabel(),
+                    ])
             ])
-            ->recordUrl(
-                fn (Post $record) => $record->user_id === Auth::id()
-                    ? static::getUrl('view', ['record' => $record->slug])
-                    : null
-            )
+            ->defaultSort('created_at', 'desc')
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->url(fn (Post $record) => static::getUrl('edit', ['record' => $record->slug]))
                     ->visible(function ($record) {
                         return $record->user->id == Auth::user()->id;
                     }),
                 Tables\Actions\ViewAction::make()
-                    ->url(fn (Post $record) => static::getUrl('view', ['record' => $record->slug]))
                     ->visible(function ($record) {
                         if ($record->user->id == Auth::user()->id && $record->status === 'Privado') {
                             return true;
@@ -101,9 +97,7 @@ class PostResource extends Resource
                     }),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\BulkActionGroup::make([]),
             ]);
     }
 
@@ -121,16 +115,16 @@ class PostResource extends Resource
                             ->columnSpan(1)
                             ->schema([
                                 TextEntry::make('title')
-                                    ->label('Titulo'),
+                                    ->label(__('labels.titulo')),
                                 TextEntry::make('date_publish')
-                                    ->label('Fecha de publicación'),
+                                    ->label(__('labels.date_publish')),
                             ]),
                         TextEntry::make('description')
-                            ->label('Descripción'),
+                            ->label(__('labels.description')),
                         Section::make('')
                             ->schema([
                                 TextEntry::make('body')
-                                    ->label('Cuerpo')
+                                    ->label(__('labels.body'))
                                     ->columnSpanFull(),
                             ]),
                     ]),
@@ -144,24 +138,19 @@ class PostResource extends Resource
         ];
     }
 
-    public static function getRecordRouteKeyName(): string
-    {
-        return 'slug';
-    }
-
     public static function getNavigationLabel(): string
     {
-        return 'Publicación';
+        return __('modules.posts.plural_name');
     }
 
     public static function getLabel(): string
     {
-        return 'publicación';
+        return __('modules.posts.singular_name');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return 'Publicaciones';
+        return __('modules.posts.plural_name');
     }
 
     public static function getPages(): array
