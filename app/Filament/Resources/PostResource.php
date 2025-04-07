@@ -17,13 +17,17 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Enum;
 
 class PostResource extends Resource
 {
     protected static ?string $model = Post::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return Post::where('user_id', Auth::id())->count();
+    }
 
     public static function form(Form $form): Form
     {
@@ -34,11 +38,14 @@ class PostResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function ($query) {
+                return $query->where('user_id', Auth::id());
+            })
             ->columns([
                 Tables\Columns\ImageColumn::make('cover')
                     ->label('')
                     ->defaultImageUrl(function ($record) {
-                        return 'https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=' . urlencode($record->name);
+                        return 'https://ui-avatars.com/api/?background=0D8ABC&color=fff&name='.urlencode($record->name);
                     }),
                 Tables\Columns\TextColumn::make('title')
                     ->label('Publicación')
@@ -47,7 +54,6 @@ class PostResource extends Resource
                     ->description(function (Post $record) {
                         return Str::limit($record->description, 40);
                     }),
-
                 Tables\Columns\TextColumn::make('user.name')
                     ->label(__('labels.user_name'))
                     ->sortable(),
@@ -69,17 +75,7 @@ class PostResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('status')
-                    ->multiple()
-                    ->searchable()
-                    ->label(__('labels.status'))
-                    ->options([
-                        Status::DRAFT->value => Status::DRAFT->getLabel(),
-                        Status::PUBLIC->value => Status::PUBLIC->getLabel(),
-                        Status::PRIVATE->value => Status::PRIVATE->getLabel(),
-                    ])
-            ])
+            ->filters([])
             ->defaultSort('created_at', 'desc')
             ->actions([
                 Tables\Actions\EditAction::make()
@@ -126,6 +122,7 @@ class PostResource extends Resource
                             ->schema([
                                 TextEntry::make('body')
                                     ->label(__('labels.body'))
+                                    ->html()
                                     ->columnSpanFull(),
                             ]),
                     ]),

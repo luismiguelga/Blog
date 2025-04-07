@@ -5,6 +5,7 @@ namespace App\Models;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -12,6 +13,8 @@ use Filament\Forms\Set;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class Category extends Model
@@ -27,6 +30,7 @@ class Category extends Model
         'name',
         'slug',
         'status',
+        'user_id',
     ];
 
     /**
@@ -36,13 +40,33 @@ class Category extends Model
      */
     protected $casts = [
         'id' => 'integer',
+        'user_id' => 'integer',
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function slug(): Attribute
     {
         return new Attribute(
-            set: fn ($value) => Str::slug($value)
+            set: fn ($value) => $this->incrementSlug($value)
         );
+    }
+
+    protected function incrementSlug($value): string
+    {
+        $slug = Str::slug($value);
+        $originalSlug = $slug;
+        $i = 1;
+
+        while (self::where('slug', $slug)->count() > 0) {
+            $slug = $originalSlug.'-'.$i;
+            $i++;
+        }
+
+        return $slug;
     }
 
     public static function getForm(): array
@@ -50,12 +74,16 @@ class Category extends Model
         return [
             Section::make('')
                 ->columns(1)
-                ->schema([TextInput::make('name')
-                    ->label(__('labels.name'))
-                    ->columnSpanFull()
-                    ->required(false)
-                    ->unique(ignoreRecord: true)
-                    ->maxLength(255),
+                ->schema([
+                    TextInput::make('name')
+                        ->label(__('labels.name'))
+                        ->columnSpanFull()
+                        ->required()
+                        ->unique(ignoreRecord: true)
+                        ->maxLength(255),
+                    Hidden::make('user_id')
+                        ->required()
+                        ->default(Auth::user()->id),
                     Group::make()
                         ->columns(2)
                         ->schema([
@@ -66,7 +94,8 @@ class Category extends Model
                                 Action::make('star')
                                     ->label(__('labels.star'))
                                     ->action(fn (Set $set) => $set('name', fake()->word())),
-                            ]), ]),
+                            ]),
+                        ]),
                 ]),
 
         ];

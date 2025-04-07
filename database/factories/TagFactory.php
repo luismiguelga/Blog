@@ -2,10 +2,9 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
-use App\Models\Post;
 use App\Models\Tag;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class TagFactory extends Factory
 {
@@ -24,6 +23,7 @@ class TagFactory extends Factory
         return [
             'name' => fake()->name(),
             'slug' => fake()->slug(),
+            'user_id' => User::factory(),
             'status' => true,
         ];
     }

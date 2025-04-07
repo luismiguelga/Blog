@@ -7,8 +7,8 @@ use App\Models\Comment;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Illuminate\Support\Facades\Auth;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class CommentResource extends Resource
 {
@@ -27,7 +27,9 @@ class CommentResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('content')
+                    ->html()
                     ->label(__('labels.content'))
+                    ->limit(40)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->label(__('labels.user_name'))
@@ -47,7 +49,7 @@ class CommentResource extends Resource
                             0 => 'Pendiente',
                         };
                     })
-                    ->color(fn($state) => $state ? 'success' : 'danger'),
+                    ->color(fn ($state) => $state ? 'success' : 'danger'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('labels.created_at'))
                     ->dateTime()
@@ -65,9 +67,9 @@ class CommentResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
-                ->visible(function ($record) {
-                    return $record->user->id == Auth::user()->id;
-                }),
+                    ->visible(function ($record) {
+                        return $record->user->id == Auth::user()->id;
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([]),

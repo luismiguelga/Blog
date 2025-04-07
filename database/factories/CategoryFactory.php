@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 use App\Models\Category;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CategoryFactory extends Factory
 {
@@ -23,6 +23,7 @@ class CategoryFactory extends Factory
         return [
             'name' => fake()->name(),
             'slug' => fake()->slug(),
+            'user_id' => User::factory(),
             'status' => true,
         ];
     }

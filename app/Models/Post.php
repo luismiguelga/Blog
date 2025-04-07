@@ -13,18 +13,16 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
-use Spatie\MediaLibrary\HasMedia;
-use Filament\Forms\Set;
-use Spatie\MediaLibrary\InteractsWithMedia;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Str;
-
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Post extends Model implements HasMedia
 {
@@ -83,14 +81,27 @@ class Post extends Model implements HasMedia
     public function slug(): Attribute
     {
         return new Attribute(
-            set: fn($value) => Str::slug($value)
+            set: fn ($value) => $this->incrementSlug($value)
         );
+    }
+
+    protected function incrementSlug($value): string
+    {
+        $slug = Str::slug($value);
+        $originalSlug = $slug;
+        $i = 1;
+
+        while (self::where('slug', $slug)->count() > 0) {
+            $slug = $originalSlug.'-'.$i;
+            $i++;
+        }
+
+        return $slug;
     }
 
     public static function getForm(): array
     {
         $date = Carbon::now();
-        $user = Auth::user()->id;
 
         return [
             Section::make('')
@@ -115,7 +126,7 @@ class Post extends Model implements HasMedia
                         ->required(),
                     Hidden::make('user_id')
                         ->required()
-                        ->default($user),
+                        ->default(Auth::user()->id),
                     Select::make('category_id')
                         ->label(__('labels.category'))
                         ->searchable()
@@ -123,12 +134,11 @@ class Post extends Model implements HasMedia
                         ->required()
                         ->createOptionForm(Category::getForm())
                         ->createOptionUsing(function ($data) {
-                            $data['slug'] = $data['name'];
                             $category = Category::create($data);
 
                             return $category->id;
                         })
-                        ->options(Category::get()->where('status', 1)->pluck('name', 'id')),
+                        ->options(Category::get()->where('status', 1)->where('user_id', Auth::user()->id)->pluck('name', 'id')),
                     DateTimePicker::make('date_publish')
                         ->label(__('labels.date_publish'))
                         ->required()
@@ -143,7 +153,7 @@ class Post extends Model implements HasMedia
                         ->columnSpanFull()
                         ->maxSize(1024 * 1024 * 10)
                         ->label(__('labels.cover'))
-                        ->directory(fn() => 'user-'.Auth::user()->id.'/posts')
+                        ->directory(fn () => 'user-'.Auth::user()->id.'/posts')
                         ->image()
                         ->imageEditor(),
                     Actions::make([
@@ -151,6 +161,7 @@ class Post extends Model implements HasMedia
                             ->label(__('labels.star'))
                             ->action(function ($livewire) {
                                 $data = Post::factory()->make()->toArray();
+                                $data['category_id'] = Category::get()->where('status', 1)->where('user_id', Auth::user()->id)->pluck('id')->random();
                                 $data['user_id'] = Auth::user()->id;
                                 $livewire->form->fill($data);
                             }),

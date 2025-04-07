@@ -8,6 +8,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class CategoryResource extends Resource
 {
@@ -21,9 +22,17 @@ class CategoryResource extends Resource
             ->schema(Category::getForm());
     }
 
+    public static function getNavigationBadge(): ?string
+    {
+        return Category::where('user_id', Auth::id())->count();
+    }
+
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function ($query) {
+                return $query->where('user_id', Auth::id());
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('labels.name'))

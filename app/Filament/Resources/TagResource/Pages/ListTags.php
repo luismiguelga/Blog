@@ -4,6 +4,7 @@ namespace App\Filament\Resources\TagResource\Pages;
 
 use App\Filament\Resources\TagResource;
 use Filament\Actions;
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 
 class ListTags extends ListRecords
@@ -14,6 +15,21 @@ class ListTags extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+        ];
+    }
+
+    public function getTabs(): array
+    {
+        return [
+            'Todas' => Tab::make(),
+            'Activas' => Tab::make()
+                ->modifyQueryUsing(function ($query) {
+                    return $query->where('status', true);
+                }),
+            'Inactivas' => Tab::make()
+                ->modifyQueryUsing(function ($query) {
+                    return $query->where('status', false);
+                }),
         ];
     }
 }

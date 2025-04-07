@@ -5,6 +5,7 @@ namespace App\Models;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Group;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class Tag extends Model
@@ -28,6 +30,7 @@ class Tag extends Model
         'name',
         'slug',
         'status',
+        'user_id',
     ];
 
     /**
@@ -37,6 +40,7 @@ class Tag extends Model
      */
     protected $casts = [
         'id' => 'integer',
+        'user_id' => 'integer',
         'post_id' => 'integer',
     ];
 
@@ -48,8 +52,22 @@ class Tag extends Model
     public function slug(): Attribute
     {
         return new Attribute(
-            set: fn($value) => Str::slug($value)
+            set: fn ($value) => $this->incrementSlug($value)
         );
+    }
+
+    protected function incrementSlug($value): string
+    {
+        $slug = Str::slug($value);
+        $originalSlug = $slug;
+        $i = 1;
+
+        while (self::where('slug', $slug)->count() > 0) {
+            $slug = $originalSlug.'-'.$i;
+            $i++;
+        }
+
+        return $slug;
     }
 
     public static function getForm(): array
@@ -64,6 +82,9 @@ class Tag extends Model
                         ->required()
                         ->maxLength(255)
                         ->unique(ignoreRecord: true),
+                    Hidden::make('user_id')
+                        ->required()
+                        ->default(Auth::user()->id),
                     Group::make()
                         ->columns(2)
                         ->schema([
@@ -73,7 +94,7 @@ class Tag extends Model
                             Actions::make([
                                 Action::make('star')
                                     ->label(__('labels.star'))
-                                    ->action(fn(Set $set) => $set('name', fake()->word())),
+                                    ->action(fn (Set $set) => $set('name', fake()->word())),
                             ]),
                         ]),
                 ]),

@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\PostResource\Pages;
 
+use App\Enums\Status;
 use App\Filament\Resources\PostResource;
 use Filament\Actions;
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 
 class ListPosts extends ListRecords
@@ -14,6 +16,25 @@ class ListPosts extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+        ];
+    }
+
+    public function getTabs(): array
+    {
+        return [
+            'Todos' => Tab::make(),
+            'Borradores' => Tab::make('Borradores')
+                ->modifyQueryUsing(function ($query) {
+                    return $query->where('status', Status::DRAFT);
+                }),
+            'Publicas' => Tab::make()
+                ->modifyQueryUsing(function ($query) {
+                    return $query->where('status', Status::PUBLIC);
+                }),
+            'Privadas' => Tab::make()
+                ->modifyQueryUsing(function ($query) {
+                    return $query->where('status', Status::PRIVATE);
+                }),
         ];
     }
 }

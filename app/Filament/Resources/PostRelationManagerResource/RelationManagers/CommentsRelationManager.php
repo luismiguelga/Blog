@@ -31,9 +31,11 @@ class CommentsRelationManager extends RelationManager
             ->recordTitleAttribute('title')
             ->columns([
                 Tables\Columns\TextColumn::make('content')
-                    ->label('Comentario'),
+                    ->label(__('labels.content'))
+                    ->html()
+                    ->limit(30),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('Usuario'),
+                    ->label(__('labels.user_name')),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->label('Estado')

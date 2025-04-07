@@ -12,9 +12,7 @@ class EditPost extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [
-            Actions\DeleteAction::make(),
-        ];
+        return [];
     }
 
     protected function mutateFormDataBeforeSave(array $data): array

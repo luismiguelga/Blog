@@ -8,12 +8,18 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class TagResource extends Resource
 {
     protected static ?string $model = Tag::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return Tag::where('user_id', Auth::id())->count();
+    }
 
     public static function form(Form $form): Form
     {
@@ -24,6 +30,9 @@ class TagResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function ($query) {
+                return $query->where('user_id', Auth::id());
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('labels.name'))
@@ -35,7 +44,7 @@ class TagResource extends Resource
                     ->formatStateUsing(function ($state) {
                         return match ($state) {
                             1 => 'Activo',
-                            0 => 'Incativo',
+                            0 => 'Inactivo',
                         };
                     })
                     ->color(fn ($state) => $state ? 'success' : 'danger'),
@@ -50,12 +59,10 @@ class TagResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-
-            ])
+            ->filters([])
             ->defaultSort('created_at', 'desc')
             ->actions([
-                Tables\Actions\EditAction::make()
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([]),
