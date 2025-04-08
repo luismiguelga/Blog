@@ -81,7 +81,9 @@ class Tag extends Model
                         ->columnSpanFull()
                         ->required()
                         ->maxLength(255)
-                        ->unique(ignoreRecord: true),
+                        ->unique(ignoreRecord: true, modifyRuleUsing: function ($rule) {
+                            return $rule->where('user_id', Auth::user()->id);
+                        }),
                     Hidden::make('user_id')
                         ->required()
                         ->default(Auth::user()->id),

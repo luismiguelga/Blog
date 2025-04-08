@@ -79,7 +79,9 @@ class Category extends Model
                         ->label(__('labels.name'))
                         ->columnSpanFull()
                         ->required()
-                        ->unique(ignoreRecord: true)
+                        ->unique(ignoreRecord: true, modifyRuleUsing: function ($rule) {
+                            return $rule->where('user_id', Auth::user()->id);
+                        })
                         ->maxLength(255),
                     Hidden::make('user_id')
                         ->required()

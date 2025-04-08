@@ -110,7 +110,9 @@ class Post extends Model implements HasMedia
                     TextInput::make('title')
                         ->label(__('labels.titulo'))
                         ->required()
-                        ->unique(ignoreRecord: true)
+                        ->unique(ignoreRecord: true, modifyRuleUsing: function ($rule) {
+                            return $rule->where('user_id', Auth::user()->id);
+                        })
                         ->maxLength(255),
                     TextInput::make('description')
                         ->label(__('labels.description'))

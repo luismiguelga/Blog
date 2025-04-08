@@ -13,15 +13,17 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->string('title')->unique();
-            $table->text('cover')->nullable();
+            $table->string('title');
+            $table->text('cover');
             $table->dateTime('date_publish');
-            $table->string('slug')->unique();
+            $table->string('slug');
             $table->string('description');
             $table->text('body');
             $table->string('status');
             $table->unsignedInteger('user_id')->constrained();
             $table->unsignedInteger('category_id')->constrained();
+            $table->unique(['title', 'user_id']);
+            $table->unique(['slug', 'user_id']);
             $table->timestamps();
         });
     }
