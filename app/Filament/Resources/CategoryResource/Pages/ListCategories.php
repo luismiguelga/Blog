@@ -26,7 +26,7 @@ class ListCategories extends ListRecords
                 ->modifyQueryUsing(function ($query) {
                     return $query->where('status', true);
                 }),
-            'Pendientes' => Tab::make()
+            'Inactivas' => Tab::make()
                 ->modifyQueryUsing(function ($query) {
                     return $query->where('status', false);
                 }),

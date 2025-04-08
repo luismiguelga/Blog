@@ -4,10 +4,10 @@ namespace Database\Factories;
 
 use App\Enums\Status;
 use App\Models\Category;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Auth;
 
 class PostFactory extends Factory
 {
@@ -26,13 +26,12 @@ class PostFactory extends Factory
         return [
             'title' => fake()->sentence(4),
             'cover' => fake()->text(),
-            'date_publish' => fake()->dateTime(),
             'slug' => fake()->slug(),
             'description' => fake()->text(),
             'body' => fake()->text(),
             'status' => fake()->randomElement(Status::class),
             'user_id' => User::all()->random()->id,
-            'category_id' => User::all()->random()->id,
+            'category_id' => Category::where('user_id', Auth::user()->id)->get()->random()->id,
         ];
     }
 }

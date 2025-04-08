@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('cover');
-            $table->dateTime('date_publish');
+            $table->dateTime('date_publish')->nullable();
             $table->string('slug');
             $table->string('description');
             $table->text('body');
             $table->string('status');
-            $table->unsignedInteger('user_id')->constrained();
-            $table->unsignedInteger('category_id')->constrained();
+            $table->foreignId('user_id')->constrained();
+            $table->foreignId('category_id')->constrained();
             $table->unique(['title', 'user_id']);
             $table->unique(['slug', 'user_id']);
             $table->timestamps();

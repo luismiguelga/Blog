@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\Status;
 use App\Filament\Resources\PostRelationManagerResource\RelationManagers\CommentsRelationManager;
 use App\Filament\Resources\PostResource\Pages;
 use App\Models\Post;
@@ -48,6 +47,7 @@ class PostResource extends Resource
                         return 'https://ui-avatars.com/api/?background=0D8ABC&color=fff&name='.urlencode($record->name);
                     }),
                 Tables\Columns\TextColumn::make('title')
+                    ->limit(30)
                     ->label('Publicación')
                     ->searchable()
                     ->sortable()
@@ -62,9 +62,11 @@ class PostResource extends Resource
                     ->badge()
                     ->sortable()
                     ->color(function ($state) {
-                        return Status::from($state)->getColor();
+                        return $state->getColor();
                     })
                     ->searchable(),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->label(__('labels.category')),
                 Tables\Columns\TextColumn::make('date_publish')
                     ->label(__('labels.date_publish'))
                     ->dateTime()
@@ -78,20 +80,8 @@ class PostResource extends Resource
             ->filters([])
             ->defaultSort('created_at', 'desc')
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->visible(function ($record) {
-                        return $record->user->id == Auth::user()->id;
-                    }),
-                Tables\Actions\ViewAction::make()
-                    ->visible(function ($record) {
-                        if ($record->user->id == Auth::user()->id && $record->status === 'Privado') {
-                            return true;
-                        } elseif ($record->status === 'Publico') {
-                            return true;
-                        }
-
-                        return false;
-                    }),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([]),
@@ -114,6 +104,9 @@ class PostResource extends Resource
                                 TextEntry::make('title')
                                     ->label(__('labels.titulo')),
                                 TextEntry::make('date_publish')
+                                    ->visible(function ($record) {
+                                        return $record->date_publish;
+                                    })
                                     ->label(__('labels.date_publish')),
                             ]),
                         TextEntry::make('description')

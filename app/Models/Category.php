@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Observers\CategoryObserver;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Group;
@@ -10,13 +11,13 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Set;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
+#[ObservedBy([CategoryObserver::class])]
 class Category extends Model
 {
     use HasFactory;
@@ -46,27 +47,6 @@ class Category extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function slug(): Attribute
-    {
-        return new Attribute(
-            set: fn ($value) => $this->incrementSlug($value)
-        );
-    }
-
-    protected function incrementSlug($value): string
-    {
-        $slug = Str::slug($value);
-        $originalSlug = $slug;
-        $i = 1;
-
-        while (self::where('slug', $slug)->count() > 0) {
-            $slug = $originalSlug.'-'.$i;
-            $i++;
-        }
-
-        return $slug;
     }
 
     public static function getForm(): array

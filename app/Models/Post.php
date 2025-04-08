@@ -4,10 +4,9 @@ namespace App\Models;
 
 use App\Enums\Status;
 use App\Observers\PostObserver;
-use Carbon\Carbon;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
@@ -15,14 +14,12 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -58,17 +55,18 @@ class Post extends Model implements HasMedia
         'id' => 'integer',
         'date_publish' => 'datetime',
         'user_id' => 'integer',
+        'status' => Status::class,
         'category_id' => 'integer',
     ];
 
-    public function tags(): HasMany
+    public function tags(): BelongsToMany
     {
-        return $this->hasMany(Tag::class);
+        return $this->BelongsToMany(Tag::class);
     }
 
-    public function categories(): BelongsToMany
+    public function category(): BelongsTo
     {
-        return $this->belongsToMany(Category::class);
+        return $this->BelongsTo(Category::class);
     }
 
     public function user(): BelongsTo
@@ -83,7 +81,6 @@ class Post extends Model implements HasMedia
 
     public static function getForm(): array
     {
-        $date = Carbon::now();
 
         return [
             Section::make('')
@@ -123,10 +120,13 @@ class Post extends Model implements HasMedia
                             return $category->id;
                         })
                         ->options(Category::where('status', 1)->where('user_id', Auth::user()->id)->get()->pluck('name', 'id')),
-                    DateTimePicker::make('date_publish')
-                        ->label(__('labels.date_publish'))
-                        ->required()
-                        ->default($date),
+                    CheckboxList::make('tags')
+                        ->relationship('tags', 'name')
+                        ->columnSpanFull()
+                        ->columns(3)
+                        ->bulkToggleable()
+                        ->options(Tag::where('status', 1)->where('user_id', Auth::user()->id)->get()->pluck('name', 'id'))
+                        ->searchable(),
                     RichEditor::make('body')
                         ->label(__('labels.body'))
                         ->columnSpanFull()

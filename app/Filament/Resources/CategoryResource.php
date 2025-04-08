@@ -36,13 +36,13 @@ class CategoryResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('labels.name'))
+                    ->limit(30)
                     ->searchable(),
-
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('labels.status'))
                     ->badge()
                     ->sortable()
-                    ->formatStateUsing(fn ($state) => $state ? 'Activo' : 'Pendiente')
+                    ->formatStateUsing(fn ($state) => $state ? 'Activo' : 'Inactivo')
                     ->color(fn ($state) => $state ? 'success' : 'danger'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('labels.created_at'))

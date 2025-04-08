@@ -35,6 +35,7 @@ class TagResource extends Resource
             })
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->limit(30)
                     ->label(__('labels.name'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')

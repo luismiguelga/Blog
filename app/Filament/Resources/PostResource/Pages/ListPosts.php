@@ -27,7 +27,7 @@ class ListPosts extends ListRecords
                 ->modifyQueryUsing(function ($query) {
                     return $query->where('status', Status::DRAFT);
                 }),
-            'Publicas' => Tab::make()
+            'Públicas' => Tab::make()
                 ->modifyQueryUsing(function ($query) {
                     return $query->where('status', Status::PUBLIC);
                 }),

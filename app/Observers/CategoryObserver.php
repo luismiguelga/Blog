@@ -2,33 +2,31 @@
 
 namespace App\Observers;
 
-use App\Models\Post;
-use Carbon\Carbon;
+use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
-class PostObserver
+class CategoryObserver
 {
-    public function creating(Post $post): void
+
+    public function creating(Category $category): void
     {
-        $post->slug = $this->handleSlug($post->title);
+        $category->slug = $this->handleSlug($category->name);
     }
 
-    public function saving(Post $post): void
+    public function saving (Category $category): void
     {
-        if ($post->status->value === 'Publico' && ! $post->date_publish) {
-            $post->date_publish = Carbon::now();
-        }
-        $post->slug = $this->handleSlug($post->title, $post->id);
+
+        $category->slug = $this->handleSlug($category->name, $category->id);
     }
 
-    protected function handleSlug(string $value, ?int $id = null): string
+    protected function handleSlug(string $value, int $id = null): string
     {
         $slug = Str::slug($value);
 
         if (Auth::check()) {
             $callback = function (string $slug) use ($id) {
-                return Post::where('slug', $slug)
+                return Category::where('slug', $slug)
                     ->where('user_id', Auth::user()->id)
                     ->where('id', '!=', $id)
                     ->exists();
@@ -40,7 +38,7 @@ class PostObserver
 
             while ($callback($slug) || $i > 20) {
 
-                $slug = $originalSlug.'-'.$i;
+                $slug = $originalSlug . '-' . $i;
                 $i++;
             }
         }
