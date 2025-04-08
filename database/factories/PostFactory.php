@@ -31,8 +31,8 @@ class PostFactory extends Factory
             'description' => fake()->text(),
             'body' => fake()->text(),
             'status' => fake()->randomElement(Status::class),
-            'user_id' => User::factory(),
-            'category_id' => Category::factory(),
+            'user_id' => User::all()->random()->id,
+            'category_id' => User::all()->random()->id,
         ];
     }
 }

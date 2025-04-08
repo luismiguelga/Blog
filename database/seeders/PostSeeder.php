@@ -100,6 +100,10 @@ class PostSeeder extends Seeder
                 'body' => 'Contenido explicando los conceptos principales...',
             ],
         ];
+
+        $users = User::all();
+        $categories = Category::all();
+
         foreach ($values as $value) {
             \App\Models\Post::create([
                 'title' => $value['title'],
@@ -109,8 +113,8 @@ class PostSeeder extends Seeder
                 'description' => $value['description'],
                 'body' => $value['body'],
                 'status' => \App\Enums\Status::PUBLIC,
-                'user_id' => User::class::all()->random()->id,
-                'category_id' => Category::class::all()->random()->id,
+                'user_id' => $users->random()->id,
+                'category_id' => $categories->random()->id,
             ]);
         }
     }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Status;
+use App\Observers\PostObserver;
 use Carbon\Carbon;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
@@ -13,6 +14,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +26,7 @@ use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+#[ObservedBy([PostObserver::class])]
 class Post extends Model implements HasMedia
 {
     use HasFactory;
@@ -78,27 +81,6 @@ class Post extends Model implements HasMedia
         return $this->hasMany(Comment::class);
     }
 
-    public function slug(): Attribute
-    {
-        return new Attribute(
-            set: fn ($value) => $this->incrementSlug($value)
-        );
-    }
-
-    protected function incrementSlug($value): string
-    {
-        $slug = Str::slug($value);
-        $originalSlug = $slug;
-        $i = 1;
-
-        while (self::where('slug', $slug)->count() > 0) {
-            $slug = $originalSlug.'-'.$i;
-            $i++;
-        }
-
-        return $slug;
-    }
-
     public static function getForm(): array
     {
         $date = Carbon::now();
@@ -140,7 +122,7 @@ class Post extends Model implements HasMedia
 
                             return $category->id;
                         })
-                        ->options(Category::get()->where('status', 1)->where('user_id', Auth::user()->id)->pluck('name', 'id')),
+                        ->options(Category::where('status', 1)->where('user_id', Auth::user()->id)->get()->pluck('name', 'id')),
                     DateTimePicker::make('date_publish')
                         ->label(__('labels.date_publish'))
                         ->required()
@@ -163,7 +145,6 @@ class Post extends Model implements HasMedia
                             ->label(__('labels.star'))
                             ->action(function ($livewire) {
                                 $data = Post::factory()->make()->toArray();
-                                $data['category_id'] = Category::get()->where('status', 1)->where('user_id', Auth::user()->id)->pluck('id')->random();
                                 $data['user_id'] = Auth::user()->id;
                                 $livewire->form->fill($data);
                             }),

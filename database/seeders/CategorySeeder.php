@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -39,13 +40,16 @@ class CategorySeeder extends Seeder
                 'status' => true,
             ],
         ];
-        foreach ($values as $value) {
-            \App\Models\Category::create([
-                'name' => $value['name'],
-                'slug' => $value['slug'],
-                'status' => $value['status'],
-                'user_id' => User::class::all()->random()->id,
-            ]);
-        }
+
+        User::all()->each(function ($user) use ($values) {
+            foreach ($values as $value) {
+                Category::create([
+                    'name' => $value['name'],
+                    'slug' => $value['slug'],
+                    'status' => $value['status'],
+                    'user_id' => $user->id,
+                ]);
+            }
+        });
     }
 }

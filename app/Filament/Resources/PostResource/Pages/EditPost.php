@@ -15,13 +15,6 @@ class EditPost extends EditRecord
         return [];
     }
 
-    protected function mutateFormDataBeforeSave(array $data): array
-    {
-        $data['slug'] = $data['title'];
-
-        return $data;
-    }
-
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
