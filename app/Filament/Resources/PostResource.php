@@ -109,8 +109,16 @@ class PostResource extends Resource
                                     })
                                     ->label(__('labels.date_publish')),
                             ]),
-                        TextEntry::make('description')
-                            ->label(__('labels.description')),
+                        Group::make()
+                            ->columnSpan(1)
+                            ->schema([
+                                TextEntry::make('description')
+                                    ->label(__('labels.description')),
+                                TextEntry::make('tags.name')
+                                ->label(__('labels.tags'))
+                                ->badge()
+                                ->color('info')
+                            ]),
                         Section::make('')
                             ->schema([
                                 TextEntry::make('body')

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Enums\Status;
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\Tag;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -98,7 +99,8 @@ class PostSeeder extends Seeder
         $categories = Category::all();
 
         foreach ($values as $value) {
-            Post::create([
+            $userId = $users->random()->id;
+            $post = Post::create([
                 'title' => $value['title'],
                 'date_publish' => Carbon::now(),
                 'slug' => $value['slug'],
@@ -106,10 +108,14 @@ class PostSeeder extends Seeder
                 'description' => $value['description'],
                 'body' => $value['body'],
                 'status' => Status::PUBLIC,
-                'user_id' => $users->random()->id,
-                'category_id' => $categories->random()->id,
-
+                'user_id' => $userId,
+                'category_id' => $categories->where('user_id', $userId)->random()->id,
             ]);
+
+            $tags = Tag::where('user_id', $userId)->get();
+
+            $post->tags()->attach($tags->random(3));
+
         }
     }
 }

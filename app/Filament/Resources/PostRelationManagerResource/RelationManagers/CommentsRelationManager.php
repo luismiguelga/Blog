@@ -38,7 +38,7 @@ class CommentsRelationManager extends RelationManager
                     ->label(__('labels.user_name')),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->label('Estado')
+                    ->label(__('labels.status'))
                     ->formatStateUsing(function ($state) {
                         return match ($state) {
                             1 => 'Activo',

@@ -14,5 +14,6 @@ return [
     'body' => 'Cuerpo',
     'cover' => 'Imagen de la publicación',
     'star' => 'Rellenar',
-    'post' => 'Publicación'
+    'post' => 'Publicación',
+    'tags' => 'Etiquetas',
 ];
